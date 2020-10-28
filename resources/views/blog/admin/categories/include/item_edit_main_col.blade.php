@@ -32,7 +32,7 @@
                     </div>
                     <div class="form-group">
                         <label for="description">Description</label>
-                        <textarea class="form-control" name="description" id="description">{{$item->description}}</textarea>
+                        <textarea class="form-control" name="description" id="description">{{old('description', $item->description)}}</textarea>
                     </div>
                 </div>
             </div>

@@ -23,7 +23,7 @@ class CategoryController extends \App\Http\Controllers\Blog\Admin\BaseController
     public function index()
     {
         $paginator = BlogCategory::paginate(5);
-        return view('blog.admin.category.index', compact('paginator'));
+        return view('blog.admin.categories.index', compact('paginator'));
     }
 
     /**
@@ -68,19 +68,36 @@ class CategoryController extends \App\Http\Controllers\Blog\Admin\BaseController
         $item = BlogCategory::findOrFail($id);
         $categoryList = BlogCategory::all();
 
-        return view('blog.admin.category.edit', compact('item', 'categoryList'));
+        return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }
 
+
     /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, $id)
     {
-        dd($request->all(), $id);
+//        $id = 1111;
+        $item = BlogCategory::find($id);
+        if(empty($item)){
+            return back()
+                ->withErrors(['msg' => "Category #$id not found"])->withInput();
+        }
+        $data = $request->all();
+       // dd($data);
+        $result = $item->fill($data)->save();
+        if($result){
+            return  redirect()
+                ->route('blog.admin.categories.edit', $item->id)
+                ->with(['success' => 'Success saved']);
+        }else{
+            return back()
+                ->withErrors(['msg' => 'Error saved'])
+                ->withInput();
+        }
+
     }
 
     /**

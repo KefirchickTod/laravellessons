@@ -19,7 +19,7 @@
                     </div>
                     <div class="form-group">
                         <label for="slug">Identification</label>
-                        <input type="text" name="slug" id="slug" class="form-control" required value="{{$item->slug}}">
+                        <input type="text" name="slug" id="slug" class="form-control"  value="{{$item->slug}}">
                     </div>
                     <div class="form-group">
                         <label for="parent_id">Parent</label>

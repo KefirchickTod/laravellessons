@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Blog\Admin;
 
 use App\Http\Controllers\Blog\BaseController;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BlogCategoryCreateRequest;
+use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Models\BlogCategory;
 use Illuminate\Http\Request;
 
@@ -33,18 +35,31 @@ class CategoryController extends \App\Http\Controllers\Blog\Admin\BaseController
      */
     public function create()
     {
-        //
+        $item = new BlogCategory();
+        $categoryList = BlogCategory::all();
+
+        return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param BlogCategoryCreateRequest$request
+     * @return mixed
      */
-    public function store(Request $request)
+    public function store(BlogCategoryCreateRequest $request)
     {
-        //
+        $data = $request->input();
+        if(empty($data['slug'])){
+            $data['slug'] = \Str::slug($data['title']);
+        }
+        $item = new BlogCategory($data);
+        $item->save();
+        if($item->exists){
+            return redirect()->route('blog.admin.categories.edit', $item->id)->with(['success' => 'Success saved']);
+        }
+        return back()->withErrors(['msg' => 'Erroro saved'])->withInput();
+
     }
 
     /**
@@ -55,7 +70,7 @@ class CategoryController extends \App\Http\Controllers\Blog\Admin\BaseController
      */
     public function show($id)
     {
-        //
+
     }
 
 
@@ -73,13 +88,25 @@ class CategoryController extends \App\Http\Controllers\Blog\Admin\BaseController
 
 
     /**
-     * @param Request $request
+     * @param BlogCategoryUpdateRequest $request
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, $id)
+    public function update(BlogCategoryUpdateRequest $request, $id)
     {
 //        $id = 1111;
+
+//        $rules = [
+//            'title' => 'required|min:5|max:200',
+//            'slug' => 'max:200',
+//            'description' => 'string|max:500|min:3',
+//            'parent_id' => 'required|integer|exists:blog_categories,id'
+//        ];
+//
+//        $validatedData = $this->validate($request, $rules);
+//
+//        dd($validatedData);
+
         $item = BlogCategory::find($id);
         if(empty($item)){
             return back()

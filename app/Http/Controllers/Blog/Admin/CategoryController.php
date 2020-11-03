@@ -7,36 +7,39 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BlogCategoryCreateRequest;
 use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Models\BlogCategory;
+use App\Repositories\BlogCategoryRepository;
 use Illuminate\Http\Request;
 
 class CategoryController extends \App\Http\Controllers\Blog\Admin\BaseController
 {
 
+    private $blogCategoryRepository;
+
     public function __construct()
     {
         // $this->middleware('auth'); //only for login users
+        parent::__construct();
+        $this->blogCategoryRepository = app(BlogCategoryRepository::class);
     }
 
+
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function index()
     {
-        $paginator = BlogCategory::paginate(5);
+        $paginator = $this->blogCategoryRepository->getAllWithPaginator(5);
         return view('blog.admin.categories.index', compact('paginator'));
     }
 
+
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function create()
     {
         $item = new BlogCategory();
-        $categoryList = BlogCategory::all();
+        $categoryList = $this->blogCategoryRepository->getForComBox();
 
         return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }
@@ -80,8 +83,11 @@ class CategoryController extends \App\Http\Controllers\Blog\Admin\BaseController
      */
     public function edit($id)
     {
-        $item = BlogCategory::findOrFail($id);
-        $categoryList = BlogCategory::all();
+        $item = $this->blogCategoryRepository->getEdit($id);
+        if(empty($item)){
+            abort(404);
+        }
+        $categoryList = $this->blogCategoryRepository->getForComBox();
 
         return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }

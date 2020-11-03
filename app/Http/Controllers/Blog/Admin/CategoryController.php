@@ -113,7 +113,7 @@ class CategoryController extends \App\Http\Controllers\Blog\Admin\BaseController
 //
 //        dd($validatedData);
 
-        $item = BlogCategory::find($id);
+        $item = $this->blogCategoryRepository->getEdit($id);
         if(empty($item)){
             return back()
                 ->withErrors(['msg' => "Category #$id not found"])->withInput();

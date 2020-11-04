@@ -3,12 +3,17 @@
 namespace App\Http\Controllers\Blog\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\BlogCategoryRepository;
 use App\Repositories\BlogPostRepository;
 use Illuminate\Http\Request;
 
 class PostController extends BaseController
 {
 
+    /**
+     * @var BlogCategoryRepository
+     */
+    private $blogCategoryRepository;
     /**
      * @var BlogPostRepository
      */
@@ -18,7 +23,7 @@ class PostController extends BaseController
     {
         parent::__construct();
         $this->blogPostRepository = app(BlogPostRepository::class);
-
+        $this->blogCategoryRepository = app(BlogCategoryRepository::class);
     }
 
     /**
@@ -67,14 +72,20 @@ class PostController extends BaseController
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function edit($id)
     {
-        //
+
+        $item = $this->blogPostRepository->getEdit($id);
+        if(empty($item)){
+            abort(404);
+        }
+        $categoryList = $this->blogCategoryRepository->getForComBox();
+
+        return view('blog.admin.posts.edit', compact('item', 'categoryList'));
+
     }
 
     /**

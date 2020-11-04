@@ -16,6 +16,9 @@ class BlogPostRepository extends CoreRepository
         return BlogPost::class;
     }
 
+    public function getEdit(int $id){
+        return $this->startConditions()->find($id);
+    }
     /**
      * @return LengthAwarePaginator
      */

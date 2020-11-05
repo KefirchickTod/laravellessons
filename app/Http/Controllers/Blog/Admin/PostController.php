@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Blog\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BlogPostUpdateRequest;
+use App\Models\BlogPost;
 use App\Repositories\BlogCategoryRepository;
 use App\Repositories\BlogPostRepository;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PostController extends BaseController
@@ -33,9 +36,9 @@ class PostController extends BaseController
      */
     public function index()
     {
-        $paginator =  $this->blogPostRepository->getAllWithPaginate();
+        $paginator = $this->blogPostRepository->getAllWithPaginate();
 
-       // dd($items);
+        // dd($items);
         return view('blog.admin.posts.index', compact('paginator'));
     }
 
@@ -52,7 +55,7 @@ class PostController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -63,7 +66,7 @@ class PostController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -79,7 +82,7 @@ class PostController extends BaseController
     {
 
         $item = $this->blogPostRepository->getEdit($id);
-        if(empty($item)){
+        if (empty($item)) {
             abort(404);
         }
         $categoryList = $this->blogCategoryRepository->getForComBox();
@@ -88,26 +91,51 @@ class PostController extends BaseController
 
     }
 
+
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param BlogPostUpdateRequest|\Illuminate\Http\Request  $request
+     * @param int                                             $id
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, $id)
+    public function update(BlogPostUpdateRequest $request, $id)
     {
-        //
+        /** @var  $item BlogPost */
+        $item = $this->blogPostRepository->getEdit(intval($id));
+        if (empty($item)) {
+            return back()
+                ->withErrors(['msg' => "Not found $id"])
+                ->withInput();
+        }
+        $data = $request->all();
+//        if(empty($data['slug'])){
+//            $data['slug'] = \Str::slug($data['title']);
+//        }
+//        if(empty($item->published_at) && $data['is_published']){
+//            $data['published_at'] = Carbon::now();
+//        }
+
+        $result = $item->update($data);
+        if($result){
+            return redirect()
+                ->route('blog.admin.post.edit', $item->id)
+                ->with(['success' => 'Success saved']);
+        }
+        return back()->
+            withErrors(['msg' => 'Error with save'])
+            ->withInput();
+
+
+
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        //
+        dd($id);
     }
 }

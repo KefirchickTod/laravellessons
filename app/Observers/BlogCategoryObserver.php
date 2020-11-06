@@ -6,6 +6,13 @@ use App\Models\BlogCategory;
 
 class BlogCategoryObserver
 {
+
+
+    private function setSlug(BlogCategory $blogCategory){
+        if(!$blogCategory->getAttribute('slug')){
+            $blogCategory->setAttribute('slug', \Str::slug($blogCategory->title));
+        }
+    }
     /**
      * Handle the blog category "created" event.
      *
@@ -48,6 +55,20 @@ class BlogCategoryObserver
     public function restored(BlogCategory $blogCategory)
     {
         //
+    }
+
+    /**
+     * @param BlogCategory $blogCategory
+     */
+    public function updating(BlogCategory $blogCategory){
+        $this->setSlug($blogCategory);
+    }
+
+    /**
+     * @param BlogCategory $blogCategory
+     */
+    public function creating(BlogCategory $blogCategory){
+        $this->setSlug($blogCategory);
     }
 
     /**

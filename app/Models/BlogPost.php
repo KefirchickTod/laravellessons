@@ -25,6 +25,7 @@ class BlogPost extends Model
 
     protected $dates = [
         'published_at',
+        'created_at'
     ];
     protected $fillable = [
         'title',

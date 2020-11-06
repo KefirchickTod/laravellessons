@@ -18,6 +18,22 @@ class BlogPostObserver
         $this->setPublishedAt($blogPost);
 
         $this->setSlug($blogPost);
+
+        $this->setUserId($blogPost);
+
+        $this->setContentHtml($blogPost);
+    }
+
+    private function setUserId(BlogPost $blogPost){
+        if(!$blogPost->user_id){
+            $blogPost->setAttribute('user_id', 1);
+        }
+    }
+
+    private function setContentHtml(BlogPost $blogPost){
+        if(!$blogPost->content_html){
+            $blogPost->setAttribute('content_html', $blogPost->content_raw);
+        }
     }
 
     /**

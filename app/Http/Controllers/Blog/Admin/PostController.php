@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Blog\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BlogPostCreateRequest;
 use App\Http\Requests\BlogPostUpdateRequest;
 use App\Models\BlogPost;
 use App\Repositories\BlogCategoryRepository;
@@ -42,25 +43,32 @@ class PostController extends BaseController
         return view('blog.admin.posts.index', compact('paginator'));
     }
 
+
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function create()
     {
-        //
+        $item = new BlogPost();
+        $categoryList = $this->blogCategoryRepository->getForComBox();
+        return view('blog.admin.posts.edit', compact('item', 'categoryList'));
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param BlogPostCreateRequest $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
+    public function store(BlogPostCreateRequest $request)
     {
-        //
+        $data = $request->input();
+      //  dd($data);
+        $item = (new BlogPost())->create($data);
+        if($item){
+            return  redirect()->route('blog.admin.post.edit', $item->id)->with(['success' => 'Success saved']);
+        }
+        return back()
+            ->withInput()
+            ->withErrors(['msg' => 'Error with create of post']);
     }
 
     /**

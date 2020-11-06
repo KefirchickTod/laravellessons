@@ -35,6 +35,11 @@ class BlogCategoryRepository  extends CoreRepository
 
         $result =  $this->startConditions()
             ->select($columns)
+//            ->with([
+//                'category' => function($query){
+//                    $query->select(['id', 'title']);
+//                }
+//            ])
             ->paginate($perPage);
         return  $result;
     }

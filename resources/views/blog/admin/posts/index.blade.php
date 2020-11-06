@@ -39,7 +39,7 @@
                                     <td>{{$item->is_published}}</td>
                                     <td>{{$item->user->name}}</td>
                                     <td>{{$item->category->title}}</td>
-                                    <td>{{$item->careated_at}}</td>
+                                    <td>{{$item->created_at->format("D M j G:i:s T Y")}}</td>
                                     <td>{{($item->published_at ? $item->published_at->format('H:i') : '')}}</td>
                                 </tr>
                             @endforeach

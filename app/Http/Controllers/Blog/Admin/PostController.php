@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Blog\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BlogPostCreateRequest;
 use App\Http\Requests\BlogPostUpdateRequest;
+use App\Jobs\BlogPostAfterCreateJop;
 use App\Models\BlogPost;
 use App\Repositories\BlogCategoryRepository;
 use App\Repositories\BlogPostRepository;
@@ -61,10 +62,12 @@ class PostController extends BaseController
     public function store(BlogPostCreateRequest $request)
     {
         $data = $request->input();
-      //  dd($data);
+        //  dd($data);
         $item = (new BlogPost())->create($data);
-        if($item){
-            return  redirect()->route('blog.admin.post.edit', $item->id)->with(['success' => 'Success saved']);
+        if ($item) {
+            $job = new BlogPostAfterCreateJop($item);
+            $this->dispatch($job);
+            return redirect()->route('blog.admin.post.edit', $item->id)->with(['success' => 'Success saved']);
         }
         return back()
             ->withInput()
@@ -101,8 +104,8 @@ class PostController extends BaseController
 
 
     /**
-     * @param BlogPostUpdateRequest|\Illuminate\Http\Request  $request
-     * @param int                                             $id
+     * @param BlogPostUpdateRequest|\Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(BlogPostUpdateRequest $request, $id)
@@ -123,27 +126,30 @@ class PostController extends BaseController
 //        }
 
         $result = $item->update($data);
-        if($result){
+        if ($result) {
             return redirect()
                 ->route('blog.admin.post.edit', $item->id)
                 ->with(['success' => 'Success saved']);
         }
         return back()->
-            withErrors(['msg' => 'Error with save'])
+        withErrors(['msg' => 'Error with save'])
             ->withInput();
-
 
 
     }
 
+
     /**
-     * Remove the specified resource from storage.
-     *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy($id)
     {
-        dd($id);
+        $result = BlogPost::destroy(intval($id));
+
+        if ($result) {
+            return redirect()->route('blog.admin.post.index')->with(['success' => 'Delete note nub ' . $id]);
+        }
+        return back()->withErrors(['msg' => 'Cant delete '.$id]);
     }
 }

@@ -22,14 +22,23 @@
                             </thead>
                             <tbody>
                             @foreach($paginator as $item)
-                                    @php /** @var $item \App\Models\BlogCategory */ @endphp
-                                    <tr>
-                                        <td>{{$item->id}}</td>
-                                        <td>
-                                            <a href="{{route('blog.admin.categories.edit', $item->id)}}">{{$item->title}}</a>
-                                        </td>
-                                        <td>{{ $item->parent_id   }}</td>
-                                    </tr>
+                                @php /** @var $item \App\Models\BlogCategory */ @endphp
+                                <tr>
+                                    <td>{{$item->id}}</td>
+                                    <td>
+                                        <a href="{{route('blog.admin.categories.edit', $item->id)}}">{{$item->title}}</a>
+                                    </td>
+                                    <td>
+
+                                        {{--                                            @if(in_array($item->parent_id, [0, 1]))--}}
+                                        {{--                                                {{$item->parentCategory->title}}--}}
+                                        {{--                                            @else--}}
+                                        {{--                                                {{ $item->parentCategory->title ?? '?'   }}--}}
+                                        {{--                                            @endif--}}
+
+                                        {{$item->parentTitle}}
+                                    </td>
+                                </tr>
                             @endforeach
                             </tbody>
                         </table>

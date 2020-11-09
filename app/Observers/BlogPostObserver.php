@@ -24,14 +24,38 @@ class BlogPostObserver
         $this->setContentHtml($blogPost);
     }
 
-    private function setUserId(BlogPost $blogPost){
-        if(!$blogPost->user_id){
+    /**
+     *
+     * @param BlogPost $blogPost
+     */
+    protected function setPublishedAt(BlogPost $blogPost)
+    {
+        if (empty($blogPost->published_at) && $blogPost->is_published) {
+            $blogPost->setAttribute('published_at', Carbon::now());
+        }
+    }
+
+    /**
+     * @param BlogPost $blogPost
+     */
+    protected function setSlug(BlogPost $blogPost)
+    {
+
+        if (empty($blogPost->slug) && $blogPost->title) {
+            $blogPost->setAttribute('slug', \Str::slug($blogPost->title));
+        }
+    }
+
+    private function setUserId(BlogPost $blogPost)
+    {
+        if (!$blogPost->user_id) {
             $blogPost->setAttribute('user_id', 1);
         }
     }
 
-    private function setContentHtml(BlogPost $blogPost){
-        if(!$blogPost->content_html){
+    private function setContentHtml(BlogPost $blogPost)
+    {
+        if (!$blogPost->content_html) {
             $blogPost->setAttribute('content_html', $blogPost->content_raw);
         }
     }
@@ -48,6 +72,12 @@ class BlogPostObserver
         $this->setPublishedAt($blogPost);
 
         $this->setSlug($blogPost);
+    }
+
+    public function deleting(BlogPost $blogPost)
+    {
+        //    dd(__METHOD__, 'deleting');
+        //    return false;
     }
 
     /**
@@ -81,27 +111,5 @@ class BlogPostObserver
     public function forceDeleted(BlogPost $blogPost)
     {
         //
-    }
-
-    /**
-     *
-     * @param BlogPost $blogPost
-     */
-    protected function setPublishedAt(BlogPost $blogPost)
-    {
-        if (empty($blogPost->published_at) && $blogPost->is_published) {
-            $blogPost->setAttribute('published_at', Carbon::now());
-        }
-    }
-
-    /**
-     * @param BlogPost $blogPost
-     */
-    protected function setSlug(BlogPost $blogPost)
-    {
-
-        if (empty($blogPost->slug) && $blogPost->title) {
-            $blogPost->setAttribute('slug', \Str::slug($blogPost->title));
-        }
     }
 }

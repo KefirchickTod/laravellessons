@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BlogPostCreateRequest;
 use App\Http\Requests\BlogPostUpdateRequest;
 use App\Jobs\BlogPostAfterCreateJop;
+use App\Jobs\BlogPostAfterDeleteJob;
 use App\Models\BlogPost;
 use App\Repositories\BlogCategoryRepository;
 use App\Repositories\BlogPostRepository;
@@ -148,6 +149,9 @@ class PostController extends BaseController
         $result = BlogPost::destroy(intval($id));
 
         if ($result) {
+
+            BlogPostAfterDeleteJob::dispatch($id)->delay(20);
+
             return redirect()->route('blog.admin.post.index')->with(['success' => 'Delete note nub ' . $id]);
         }
         return back()->withErrors(['msg' => 'Cant delete '.$id]);
